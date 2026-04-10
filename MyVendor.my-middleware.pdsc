@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stm32="https://developer.st.com/schemas/stm32cube/1.0.0" schemaVersion="1.7.55" xsi:noNamespaceSchemaLocation="PACK.xsd" xsi:schemaLocation="https://developer.st.com/schemas/stm32cube/1.0.0 stm32cube.xsd" Dvendor="STMicroelectronics:13" Dname="STM32*">
+  <vendor>MyVendor</vendor>
+  <name>my-middleware</name>
+  <environments>
+    <environment name="STM32Cube">
+      <stm32:pack type="MW" friendlyName="my-middleware" shortDesc="My Middleware RTOS template">
+        <compatibility>
+          <release version="1.0.0">
+            <applicable-schema schemaType="sw-configuration" schemaVersion="3.8.0"/>
+            <applicable-api-group apiType="codegen-getters">
+              <applicable-api apiType="SWConfigurationAPI" apiVersion="1.0.0"/>
+              <applicable-api apiType="SWProjectAPI"       apiVersion="1.0.0"/>
+              <applicable-api apiType="EnvVarAPI"          apiVersion="1.0.0"/>
+            </applicable-api-group>
+          </release>
+        </compatibility>
+      </stm32:pack>
+    </environment>
+  </environments>
+  <ECCN>
+    <ECCN-EU>NEC</ECCN-EU>
+    <ECCN-US>EAR99</ECCN-US>
+  </ECCN>
+  <description>My Middleware CMSIS pack template (RTOS category)</description>
+  <url>https://example.com/pack-server/</url>
+  <license>LICENSE.md</license>
+  <releases>
+    <release version="1.0.0" date="2026-01-01">
+      Initial release of My Middleware pack template.
+    </release>
+  </releases>
+  <keywords>
+    <keyword>MyVendor</keyword>
+    <keyword>Middleware</keyword>
+    <keyword>RTOS</keyword>
+    <keyword>Component model</keyword>
+    <keyword>Template</keyword>
+    <keyword>my-middleware</keyword>
+  </keywords>
+  <conditions>
+    <condition id="MyMiddleware Core condition">
+      <description>No additional constraint</description>
+    </condition>
+    <condition id="MyMiddleware Component A condition">
+      <description>Requires the MyMiddleware Core component</description>
+      <require Cclass="RTOS" Cgroup="MyMiddleware" Csub="Core"/>
+    </condition>
+    <condition id="MyMiddleware Component B condition">
+      <description>Requires the MyMiddleware Core component</description>
+      <require Cclass="RTOS" Cgroup="MyMiddleware" Csub="Core"/>
+    </condition>
+    <condition id="MyMiddleware Optional Component B condition">
+      <description>Optional selection of Component B driven by CubeMX2 configuration</description>
+    </condition>
+    <condition id="MyMiddleware Init condition">
+      <description>Requires Core, Component A, and optionally Component B</description>
+      <require Cclass="RTOS" Cgroup="MyMiddleware" Csub="Core"/>
+      <require Cclass="RTOS" Cgroup="MyMiddleware" Csub="Component A"/>
+      <require condition="MyMiddleware Optional Component B condition"/>
+    </condition>
+  </conditions>
+  <!-- This generator is launched if any component referencing this generator by 'id' is selected and the specified <gpdsc> file does not exist -->
+  <generators>
+    <generator id="my_middleware_mx2codegen">
+      <description>MyVendor: STM32Cube Code Generator for My Middleware</description>
+      <exe>
+        <command host="win">.config/gen_code.bat</command>
+        <command host="linux">.config/gen_code.sh</command>
+        <command host="mac">.config/gen_code.sh</command>
+        <!-- $S = Device Family Pack base folder -->
+        <argument>$S</argument>
+        <!-- $D = Device name (Dname/Dvariant as configured by environment) -->
+        <argument>$D</argument>
+        <!-- Project path and project name (as configured by environment) -->
+        <argument>$P</argument>
+        <argument>#P</argument>
+        <!-- Name of the GPDSC Handlebars template inside .config/ -->
+        <argument>MyVendor.my-middleware.gpdsc.hbs</argument>
+        <!-- Generator ID passed to cube codegen -->
+        <argument>my_middleware_mx2codegen</argument>
+        <argument>$G</argument>
+        <!-- Flag to indicate that this Generator is dry-run capable -->
+        <argument mode="dry-run">--dry-run</argument>
+      </exe>
+      <gpdsc name="$P/MyVendor.my-middleware.gpdsc"/>
+    </generator>
+  </generators>
+  <!-- START: MyVendor My Middleware -->
+  <components>
+    <component Cclass="RTOS" Cgroup="MyMiddleware" Csub="Core" Cversion="1.0.0" condition="MyMiddleware Core condition" maxInstances="1">
+      <description>My Middleware core library</description>
+      <files>
+        <file category="source"  name="my_middleware.c"/>
+        <file category="include" name="include/"/>
+        <file category="header"  name="include/my_middleware.h"/>
+      </files>
+    </component>
+    <component Cclass="RTOS" Cgroup="MyMiddleware" Csub="Component A" Cversion="1.0.0" condition="MyMiddleware Component A condition" maxInstances="1">
+      <description>My Middleware Component A, always enabled by the CubeMX2 configuration component</description>
+      <files>
+        <file category="source"  name="include/my_middleware_component_a.c"/>
+        <file category="include" name="include/"/>
+        <file category="header"  name="include/my_middleware_component_a.h"/>
+      </files>
+    </component>
+    <component Cclass="RTOS" Cgroup="MyMiddleware" Csub="Component B" Cversion="1.0.0" condition="MyMiddleware Component B condition" maxInstances="1">
+      <description>My Middleware Component B, optional and controlled by CubeMX2 configuration</description>
+      <files>
+        <file category="source"  name="include/my_middleware_component_b.c"/>
+        <file category="include" name="include/"/>
+        <file category="header"  name="include/my_middleware_component_b.h"/>
+      </files>
+    </component>
+    <!-- START: MyVendor My Middleware Code Gen -->
+    <component generator="my_middleware_mx2codegen" Cclass="RTOS" Cgroup="STM32CubeMX2 Config" Csub="MyMiddleware" Cversion="1.0.0" condition="MyMiddleware Init condition">
+      <description>MyVendor: STM32Cube Configuration Code Generation for My Middleware</description>
+      <environments>
+        <environment name="STM32Cube">
+          <stm32:component>
+            <middleware-entry-point id="MyMiddleware" name="My Middleware" category="RTOS"/>
+          </stm32:component>
+        </environment>
+      </environments>
+      <files>
+        <file category="genAsset" name=".config/gen_code.bat"/>
+        <file category="genAsset" name=".config/gen_code.sh"/>
+        <file category="genAsset" name=".config/MyVendor.my-middleware.gpdsc.hbs"/>
+        <file category="genAsset" name=".config/my_middleware_config_parameters.json"/>
+        <file category="genAsset" name=".config/template/my_middleware_config_template.h.hbs"/>
+        <file category="genAsset" name=".config/template/partials/LICENSE_partial.hbs"/>
+      </files>
+    </component>
+  </components>
+  <!-- END: MyVendor My Middleware -->
+</package>

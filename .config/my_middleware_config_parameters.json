@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "version": "1.0.0",
+
+  "componentid": "::RTOS:STM32CubeMX2 Config:MyMiddleware",
+
+  "type": "object",
+
+  "grammarVersion": "3.8.0",
+
+  "properties": {
+    "parameters": {
+      "type": "object",
+      "properties": {
+
+        "core": {
+          "type": "object",
+          "title": "Core settings",
+          "properties": {
+
+            "buffer": {
+              "type": "object",
+              "title": "Buffer configuration",
+              "properties": {
+
+                "buffer_size": {
+                  "title": "Buffer size",
+                  "description": "Size of the internal ring buffer in bytes. Must be a power of two for optimal performance.",
+                  "type": "integer",
+                  "default": 256,
+                  "minimum": 16,
+                  "maximum": 65536,
+                  "unit": "bytes"
+                },
+
+                "enable_overwrite": {
+                  "title": "Enable overwrite on overflow",
+                  "description": "When enabled, new data overwrites the oldest unread bytes when the buffer is full. When disabled, writes fail if the buffer is full.",
+                  "type": "boolean",
+                  "default": false
+                }
+
+              }
+            }
+
+          }
+        },
+
+        "components": {
+          "type": "object",
+          "title": "Component selection",
+          "properties": {
+
+            "pack_components": {
+              "type": "object",
+              "title": "OpenCMSIS-Pack components",
+              "properties": {
+
+                "component_a_always_enabled": {
+                  "title": "Component A",
+                  "description": "Component A is always required by the CubeMX2 configuration component in this template.",
+                  "type": "boolean",
+                  "default": true,
+                  "actions": [
+                    {
+                      "type": "disable",
+                      "condition": "true"
+                    }
+                  ]
+                },
+
+                "enable_component_b": {
+                  "title": "Enable optional Component B",
+                  "description": "When enabled, the generated GPDSC requires Component B so it becomes part of the final project.",
+                  "type": "boolean",
+                  "default": false
+                }
+
+              }
+            }
+
+          }
+        }
+
+      }
+    }
+  }
+}

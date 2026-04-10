@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+{{!--
+  ============================================================================
+  File  : MyVendor.my-middleware.gpdsc.hbs
+  Brief : Generator PDSC (GPDSC) Handlebars template.
+
+  STM32CubeMX2 uses this template AFTER running code generation to produce
+  the final "MyVendor.my-middleware.gpdsc" file.  The GPDSC tells the IDE
+  which files were generated and how they map to CMSIS components so the
+  build system can compile them automatically.
+
+  Template engine : Handlebars (with STM32CubeMX2 built-in helpers)
+  Available APIs  :
+    @root.pdscAPI             — pack metadata helpers
+    @root.SWConfigurationAPI  — access to user configuration values
+    @root.EnvVarAPI           — environment variable access
+    components                — list of selected CMSIS components (built-in)
+  ============================================================================
+--}}
+{{!-- Retrieve the single instance of the config component --}}
+{{assign 'mw_instances' (@root.SWConfigurationAPI.getInstances "MyVendor::RTOS:STM32CubeMX2 Config:MyMiddleware")~}}
+{{assign 'mw_ctx'       (@root.SWConfigurationAPI.getInstanceConfiguration (lookup @root.mw_instances 0))~}}
+{{assign 'mw_params'    @root.mw_ctx.settings.parameters.core.buffer~}}
+{{assign 'mw_components' @root.mw_ctx.settings.parameters.components.pack_components~}}
+<package
+  xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+  schemaVersion="1.0"
+  xs:noNamespaceSchemaLocation="https://github.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/blob/main/schema/PACK.xsd">
+
+  {{!-- Pack identity — provided by dedicated pdscAPI helpers --}}
+  <vendor>{{@root.pdscAPI.getPackVendor}}</vendor>
+  <name>{{@root.pdscAPI.getPackName}}</name>
+  <url>{{@root.pdscAPI.getPackURL}}</url>
+
+  <releases>
+    <release version="1.0.0" date="2026-01-01">
+      Initial GPDSC release for My Middleware.
+    </release>
+  </releases>
+
+  <conditions>
+    {{!--
+      Re-export all conditions from the original PDSC so the IDE can still
+      resolve component dependencies after code generation.
+    --}}
+    {{assign "conditions" (@root.pdscAPI.getAllPDSCConditionsWithFilters exclude="MyMiddleware Optional Component B condition")}}
+    {{{@root.conditions}}}
+    <condition id="MyMiddleware Optional Component B condition">
+      <description>Optional selection of Component B driven by CubeMX2 configuration</description>
+{{#if @root.mw_components.enable_component_b}}
+      <require Cclass="RTOS" Cgroup="MyMiddleware" Csub="Component B"/>
+{{/if}}
+    </condition>
+  </conditions>
+
+  <components>
+    {{!--
+      The `components` variable is automatically populated by CubeMX2 with
+      the list of CMSIS components that were selected and generated.
+      Each entry exposes Handlebars properties for the component attributes
+      and a `files_array` with the generated file paths.
+    --}}
+    {{#each components}}
+    <component {{{generatorId}}} {{{Cclass}}} {{{Cgroup}}} {{{Csub}}} {{{Cbundle}}} {{{Cvariant}}} {{{Cversion}}} {{{condition}}}>
+      <description>{{description}}</description>
+      <files>
+        {{#each files_array}}
+        <file category="{{category}}" name="{{gen_file}}" />
+        {{/each}}
+      </files>
+    </component>
+    {{/each}}
+  </components>
+
+</package>
