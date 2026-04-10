@@ -23,7 +23,7 @@
     <ECCN-US>EAR99</ECCN-US>
   </ECCN>
   <description>My Middleware CMSIS pack template (RTOS category)</description>
-  <url>https://example.com/pack-server/</url>
+  <url>https://github.com/Orel138/MW_Template_MX2_pack/raw/main/</url>
   <license>LICENSE.md</license>
   <releases>
     <release version="1.0.0" date="2026-01-01">
