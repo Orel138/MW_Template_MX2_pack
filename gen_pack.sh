@@ -14,6 +14,12 @@ REQUIRED_GEN_PACK_LIB="0.12.0"
 # Set default command line arguments
 DEFAULT_ARGS=()
 
+# Generate release history from v-prefixed Git tags when building a tagged revision.
+CURRENT_TAG="$(git describe --exact-match --tags HEAD 2>/dev/null || true)"
+if [[ "${CURRENT_TAG}" == v* ]]; then
+  DEFAULT_ARGS=(-c "v")
+fi
+
 # Pack warehouse directory - destination
 # Default: ./output
 #

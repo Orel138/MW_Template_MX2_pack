@@ -1,12 +1,14 @@
-name: Build pack
+name: Build and release pack
 
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches: [main]
-  release:
-    types: [published]
+    tags: [v*]
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +24,6 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch tags
-        if: github.event_name == 'release'
         run: |
           git fetch --tags --force
 
@@ -36,3 +37,11 @@ jobs:
           packchk-version: 1.4.1
           gen-pack-script: ./gen_pack.sh
           gen-pack-output: ./output
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: ./output/*.pack
+          fail_on_unmatched_files: true
+          generate_release_notes: true
